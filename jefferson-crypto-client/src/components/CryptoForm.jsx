@@ -41,7 +41,7 @@ export default function CryptoForm({ onLogs }) {
   };
 
   return (
-    <form onSubmit={submit} className="bg-white shadow-xl rounded-2xl p-6 space-y-6">
+    <form onSubmit={submit} className="w-full max-w-xl mx-auto bg-white shadow-xl rounded-2xl p-6 space-y-6">
       <h1 className="text-3xl font-bold text-center">Jefferson Disk Cipher</h1>
 
       {/* Mode switch */}
@@ -128,5 +128,5 @@ export default function CryptoForm({ onLogs }) {
       {/* Error */}
       {error && <p className="text-red-600 font-semibold">{error}</p>}
     </form>
-  )
+  );
 }
