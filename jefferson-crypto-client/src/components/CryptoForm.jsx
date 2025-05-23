@@ -42,12 +42,12 @@ export default function CryptoForm({ onLogs }) {
 
   return (
     <form onSubmit={submit} className="w-full max-w-xl mx-auto bg-white shadow-xl rounded-2xl p-6 space-y-6">
-      <h1 className="text-3xl font-bold text-center">Jefferson Disk Cipher</h1>
+      <h1 className="text-3xl font-bold text-center">Jefferson Disk Cipher 123</h1>
 
       {/* Mode switch */}
       <div className="flex justify-center gap-8">
         {[
-          { v: "encrypt", label: "Шифровать123" },
+          { v: "encrypt", label: "Шифровать" },
           { v: "decrypt", label: "Дешифровать" },
         ].map((opt) => (
           <label key={opt.v} className="inline-flex items-center gap-2 cursor-pointer">
