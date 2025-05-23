@@ -1,7 +1,7 @@
 const API_BASE =
   import.meta.env.VITE_API_BASE || "http://localhost:8080/api/jefferson";
 
-/* --- обычные, короткие ответы 1 --- */
+/* --- обычные, короткие ответы --- */
 export const jeffersonEncrypt  = (m, k = "") => call("encrypt",  { message: m, key: k });
 export const jeffersonDecrypt  = (m, k = "") => call("decrypt",  { message: m, key: k });
 
