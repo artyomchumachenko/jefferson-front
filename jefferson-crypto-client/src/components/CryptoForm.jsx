@@ -47,7 +47,7 @@ export default function CryptoForm({ onLogs }) {
       {/* Mode switch */}
       <div className="flex justify-center gap-8">
         {[
-          { v: "encrypt", label: "Шифровать" },
+          { v: "encrypt", label: "Encrypt" },
           { v: "decrypt", label: "Дешифровать" },
         ].map((opt) => (
           <label key={opt.v} className="inline-flex items-center gap-2 cursor-pointer">
