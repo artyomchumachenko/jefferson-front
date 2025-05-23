@@ -14,7 +14,7 @@ export const jeffersonDecryptVerbose = (m, k = "") =>
 /* ---------- helpers ---------- */
 async function call(endpoint, body) {
   const res = await callRaw(endpoint, body);  // JeffersonResponse -> {result}
-  // На бэке бывают и {cipher}, и {result}. Возьмём то, что есть.
+  // На бэке бывают и {cipher}, и {result}. Возьмём то, что есть. 123
   return res.result ?? res.cipher;
 }
 async function callRaw(endpoint, body) {
