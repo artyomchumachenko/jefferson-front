@@ -4,7 +4,7 @@ export default function CryptoLogs({ disks }) {
   if (!disks) {
     return (
       <div className="w-full rounded-2xl bg-white text-slate-400 shadow-xl p-6 italic flex items-center justify-center">
-        -- Включи логирование результатов --
+        Лог появится здесь
       </div>
     );
   }
