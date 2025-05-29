@@ -18,13 +18,15 @@ pipeline {
       steps {
         sshagent([env.GIT_CREDENTIALS]) {
           sh '''
-            # если нет рабочей копии — клонируем
-            if [ ! -d "${WORK_TREE}/.git" ]; then
-              git clone ${REPO_URL} --branch ${BRANCH} ${WORK_TREE}
+            # если нет папки .git, считаем, что репо не инициализировано
+            if [ ! -d "$WORK_TREE/.git" ]; then
+              echo "[$(date)] Обнаружена не-валидная папка $WORK_TREE, пересоздаём..."
+              rm -rf "$WORK_TREE"
+              git clone "$REPO_URL" --branch "$BRANCH" "$WORK_TREE"
             fi
 
-            cd ${WORK_TREE}
-            git fetch origin ${BRANCH}
+            cd "$WORK_TREE"
+            git fetch origin "$BRANCH"
           '''
         }
       }
