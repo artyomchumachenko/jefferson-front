@@ -6,7 +6,7 @@ pipeline {
 
   environment {
     GIT_CREDENTIALS = 'TSSH'                                 // учётка для доступа к Git
-    REPO_URL        = 'git@github.com:artyomchumachenko/frontend.git'
+    REPO_URL        = 'git@github.com:artyomchumachenko/jefferson-front.git'
     BRANCH          = 'master'
     WORK_TREE       = '/opt/myapp/frontend'
     DEPLOY_DIR      = '/var/www/myapp/mai/jefferson'
