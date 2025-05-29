@@ -87,7 +87,7 @@ pipeline {
           rsync -a --delete ${WORK_TREE}/dist/ ${DEPLOY_DIR}/
 
           echo "[$(date)] Test nginx config"
-          if nginx -t; then
+          if sudo nginx -t; then
             echo "[$(date)] Reload nginx"
             systemctl reload ${NGINX_SERVICE}
           else
