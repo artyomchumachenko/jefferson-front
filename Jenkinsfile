@@ -80,16 +80,16 @@ pipeline {
       steps {
         sh '''
           echo "[$(date)] Prepare deploy dir ${DEPLOY_DIR}"
-          sudo mkdir -p ${DEPLOY_DIR}
-          sudo rm -rf ${DEPLOY_DIR}/*
+          mkdir -p ${DEPLOY_DIR}
+          rm -rf ${DEPLOY_DIR}/*
 
           echo "[$(date)] rsync dist → deploy"
-          sudo rsync -a --delete ${WORK_TREE}/dist/ ${DEPLOY_DIR}/
+          rsync -a --delete ${WORK_TREE}/dist/ ${DEPLOY_DIR}/
 
           echo "[$(date)] Test nginx config"
-          if sudo nginx -t; then
+          if nginx -t; then
             echo "[$(date)] Reload nginx"
-            sudo systemctl reload ${NGINX_SERVICE}
+            systemctl reload ${NGINX_SERVICE}
           else
             echo "[$(date)] ERROR: nginx config failed"
             exit 1
