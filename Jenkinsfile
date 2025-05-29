@@ -17,7 +17,7 @@ pipeline {
     stage('Checkout & Fetch') {
       steps {
         sshagent([env.GIT_CREDENTIALS]) {
-          sh """
+          sh '''
             # если нет рабочей копии — клонируем
             if [ ! -d "${WORK_TREE}/.git" ]; then
               git clone ${REPO_URL} --branch ${BRANCH} ${WORK_TREE}
@@ -25,7 +25,7 @@ pipeline {
 
             cd ${WORK_TREE}
             git fetch origin ${BRANCH}
-          """
+          '''
         }
       }
     }
@@ -76,7 +76,7 @@ pipeline {
         expression { shouldBuild }
       }
       steps {
-        sh """
+        sh '''
           echo "[$(date)] Prepare deploy dir ${DEPLOY_DIR}"
           sudo mkdir -p ${DEPLOY_DIR}
           sudo rm -rf ${DEPLOY_DIR}/*
@@ -92,7 +92,7 @@ pipeline {
             echo "[$(date)] ERROR: nginx config failed"
             exit 1
           fi
-        """
+        '''
       }
     }
   }
