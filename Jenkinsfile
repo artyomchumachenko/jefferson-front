@@ -1,11 +1,17 @@
-// Groovy-переменная для флага сборки
-def shouldBuild = false
-
 pipeline {
   agent any
 
+  // Добавляем параметр
+  parameters {
+    booleanParam(
+      name: 'FORCE_BUILD',
+      defaultValue: false,
+      description: 'Если true — игнорировать отсутствие новых коммитов и всё равно собрать/задеплоить'
+    )
+  }
+
   environment {
-    GIT_CREDENTIALS = 'TSSH'                                 // учётка для доступа к Git
+    GIT_CREDENTIALS = 'TSSH'
     REPO_URL        = 'git@github.com:artyomchumachenko/jefferson-front.git'
     BRANCH          = 'master'
     WORK_TREE       = '/opt/myapp/frontend'
@@ -18,13 +24,11 @@ pipeline {
       steps {
         sshagent([env.GIT_CREDENTIALS]) {
           sh '''
-            # если нет папки .git, считаем, что репо не инициализировано
             if [ ! -d "$WORK_TREE/.git" ]; then
-              echo "[$(date)] Обнаружена не-валидная папка $WORK_TREE, пересоздаём..."
+              echo "[$(date)] Инициализируем репозиторий..."
               rm -rf "$WORK_TREE"
               git clone "$REPO_URL" --branch "$BRANCH" "$WORK_TREE"
             fi
-
             cd "$WORK_TREE"
             git fetch origin "$BRANCH"
           '''
@@ -36,21 +40,23 @@ pipeline {
       steps {
         dir("${WORK_TREE}") {
           script {
-            def remote = sh(
-              script: "git rev-parse origin/${BRANCH}",
-              returnStdout: true
-            ).trim()
-            def local = sh(
-              script: 'git rev-parse HEAD',
-              returnStdout: true
-            ).trim()
+            // По умолчанию — не строим
+            shouldBuild = false
 
-            if (remote != local) {
-              echo "🔄 Новые коммиты: ${local} → ${remote}"
-              sh "git reset --hard origin/${BRANCH}"
+            if (params.FORCE_BUILD) {
+              echo "🚀 Принудительная сборка: FORCE_BUILD=true"
               shouldBuild = true
             } else {
-              echo "✅ Нет новых коммитов (HEAD=${local}), пропускаем build/deploy"
+              def remote = sh(script: "git rev-parse origin/${BRANCH}", returnStdout: true).trim()
+              def local  = sh(script: "git rev-parse HEAD",              returnStdout: true).trim()
+
+              if (remote != local) {
+                echo "🔄 Новые коммиты: ${local} → ${remote}"
+                sh "git reset --hard origin/${BRANCH}"
+                shouldBuild = true
+              } else {
+                echo "✅ Нет новых коммитов (HEAD=${local}), пропускаем build/deploy"
+              }
             }
           }
         }
@@ -58,9 +64,7 @@ pipeline {
     }
 
     stage('Build') {
-      when {
-        expression { shouldBuild }
-      }
+      when { expression { shouldBuild } }
       steps {
         dir("${WORK_TREE}") {
           sh '''
@@ -74,24 +78,22 @@ pipeline {
     }
 
     stage('Deploy') {
-      when {
-        expression { shouldBuild }
-      }
+      when { expression { shouldBuild } }
       steps {
         sh '''
-          echo "[$(date)] Prepare deploy dir ${DEPLOY_DIR}"
+          echo "[$(date)] Подготовка директории ${DEPLOY_DIR}"
           mkdir -p ${DEPLOY_DIR}
           rm -rf ${DEPLOY_DIR}/*
 
           echo "[$(date)] rsync dist → deploy"
           rsync -a --delete ${WORK_TREE}/dist/ ${DEPLOY_DIR}/
 
-          echo "[$(date)] Test nginx config"
+          echo "[$(date)] Проверка конфигурации nginx"
           if sudo nginx -t; then
-            echo "[$(date)] Reload nginx"
+            echo "[$(date)] Перезагружаем nginx"
             systemctl reload ${NGINX_SERVICE}
           else
-            echo "[$(date)] ERROR: nginx config failed"
+            echo "[$(date)] ❌ Конфиг nginx невалиден"
             exit 1
           fi
         '''
@@ -103,14 +105,14 @@ pipeline {
     success {
       script {
         if (shouldBuild) {
-          echo '✅ Успешно собрали и задеплоили frontend'
+          echo '✅ Сборка и деплой прошли успешно'
         } else {
-          echo 'ℹ️ Сборка и деплой не требуются (нет новых коммитов)'
+          echo 'ℹ️ Сборка и деплой не требуются'
         }
       }
     }
     failure {
-      echo '❌ Ошибка, смотрите логи'
+      echo '❌ Произошла ошибка, смотрите логи'
     }
   }
 }
